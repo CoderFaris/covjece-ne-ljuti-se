@@ -10,6 +10,14 @@ import (
 
 type Board [11][11]string
 
+var p1out, p2out bool
+
+var p1PosX = 10
+var p1PosY = 4
+
+var p2PosX = 4
+var p2PosY = 0
+
 // initializing and returning board
 func GetBoard() Board {
 	red := color.New(color.FgRed).SprintFunc()
@@ -127,6 +135,7 @@ func P1Out() bool {
 	}
 
 	// player managed to go to the starting point
+	p1out = true
 	b[10][4] = "1"
 	DrawCurrentBoard(b)
 
@@ -147,6 +156,7 @@ func P2Out() bool {
 	}
 
 	// player managed to go to the starting point
+	p2out = true
 	b[4][0] = "1"
 	DrawCurrentBoard(b)
 
@@ -154,7 +164,7 @@ func P2Out() bool {
 
 }
 
-func P1Move(posX, posY int, b Board) {
+func P1Move(posX, posY int, b Board) (int, int) {
 
 	fmt.Print("Rolling dice...\n")
 	time.Sleep(2 * time.Second)
@@ -163,10 +173,11 @@ func P1Move(posX, posY int, b Board) {
 	b[posX][posY] = "0"
 	b[posX-roll][posY] = "1"
 	DrawCurrentBoard(b)
+	return posX - roll, posY
 
 }
 
-func P2Move(posX, posY int, b Board) {
+func P2Move(posX, posY int, b Board) (int, int) {
 
 	fmt.Print("Rolling dice...\n")
 	time.Sleep(2 * time.Second)
@@ -175,6 +186,13 @@ func P2Move(posX, posY int, b Board) {
 	b[posX][posY] = "0"
 	b[posX][posY+roll] = "1"
 	DrawCurrentBoard(b)
+	return posX, posY + roll
+
+}
+
+func calculateMove(posX, posY int, b Board) bool {
+
+	return true
 
 }
 
@@ -188,16 +206,22 @@ func Game() {
 			fmt.Print("(P1) Roll dice? (1 for Yes, any key for No): ")
 			fmt.Scan(&choice)
 			if wantsToRoll(choice) {
-				if P1Out() {
-					fmt.Print("(P1) Roll again? (1 for Yes, any key for No): ")
-					fmt.Scan(&choice)
-					if wantsToRoll(choice) {
-						P1Move(10, 4, b)
-						currentPlayer = 1
+				if !p1out {
+					if P1Out() {
+						fmt.Print("(P1) Roll again? (1 for Yes, any key for No): ")
+						fmt.Scan(&choice)
+						if wantsToRoll(choice) {
+							b[10][4] = "0"
+							p1PosX, p1PosY = P1Move(p1PosX, p1PosY, b)
+							fmt.Println(p1PosX, p1PosY)
+
+						}
 					}
 				} else {
-					currentPlayer = 1
+					p1PosX, p1PosY = P1Move(p1PosX, p1PosY, b)
+					fmt.Println(p1PosX, p1PosY)
 				}
+				currentPlayer = 1
 			} else {
 				fmt.Println("Skipping turn.")
 				currentPlayer = 1
@@ -206,16 +230,21 @@ func Game() {
 			fmt.Print("(P2) Roll dice? (1 for Yes, 0 for No): ")
 			fmt.Scan(&choice)
 			if wantsToRoll(choice) {
-				if P2Out() {
-					fmt.Print("(P2) Roll again? (1 for Yes, 0 for No): ")
-					fmt.Scan(&choice)
-					if wantsToRoll(choice) {
-						P2Move(4, 0, b)
-						currentPlayer = 0
+				if !p2out {
+					if P2Out() {
+						fmt.Print("(P2) Roll again? (1 for Yes, 0 for No): ")
+						fmt.Scan(&choice)
+						if wantsToRoll(choice) {
+							b[4][0] = "0"
+							p2PosX, p2PosY = P2Move(p2PosX, p2PosY, b)
+							fmt.Println(p2PosX, p2PosY)
+						}
 					}
 				} else {
-					currentPlayer = 0
+					p2PosX, p2PosY = P2Move(p2PosX, p2PosY, b)
+					fmt.Println(p1PosX, p1PosY)
 				}
+				currentPlayer = 0
 			} else {
 				fmt.Println("Skipping turn.")
 				currentPlayer = 0
