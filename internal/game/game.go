@@ -18,6 +18,33 @@ var p1PosY = 4
 var p2PosX = 4
 var p2PosY = 0
 
+var player1Path = [][]int{
+
+	{10, 4}, {9, 4}, {8, 4}, {7, 4}, {6, 4},
+	{6, 3}, {6, 2}, {6, 1}, {6, 0}, {5, 0},
+	{4, 0}, {4, 1}, {4, 2}, {4, 3}, {4, 4},
+	{3, 4}, {2, 4}, {1, 4}, {0, 4}, {0, 5},
+	{0, 6}, {1, 6}, {2, 6}, {3, 6}, {4, 6}, {4, 7},
+	{4, 8}, {4, 9}, {4, 10}, {5, 10}, {6, 10},
+	{6, 9}, {6, 8}, {6, 7}, {6, 6}, {7, 6},
+	{8, 6}, {9, 6}, {10, 6}, {10, 5},
+}
+
+var player2Path = [][]int{
+
+	{4, 0}, {4, 1}, {4, 2}, {4, 3}, {4, 4},
+	{3, 4}, {2, 4}, {1, 4}, {0, 4}, {0, 5},
+	{0, 6}, {1, 6}, {2, 6}, {3, 6}, {4, 6}, {4, 7},
+	{4, 8}, {4, 9}, {4, 10}, {5, 10}, {6, 10},
+	{6, 9}, {6, 8}, {6, 7}, {6, 6}, {7, 6},
+	{8, 6}, {9, 6}, {10, 6}, {10, 5},
+	{10, 4}, {9, 4}, {8, 4}, {7, 4}, {6, 4},
+	{6, 3}, {6, 2}, {6, 1}, {6, 0}, {5, 0}, {4, 0},
+}
+
+var p1PathIndex int
+var p2PathIndex int
+
 // initializing and returning board
 func GetBoard() Board {
 	red := color.New(color.FgRed).SprintFunc()
@@ -122,8 +149,6 @@ func isOut(roll int) bool {
 var b = GetBoard()
 
 // board for calculations
-var calcB = GetBoard()
-var validPositions = getValidPositions(calcB)
 
 func P1Out() bool {
 
@@ -167,95 +192,98 @@ func P2Out() bool {
 
 }
 
-func P1Move(posX, posY int) (int, int) {
+func P1Move(posX, posY, pathIndex int) (int, int, int) {
 	fmt.Print("Rolling dice...\n")
 	time.Sleep(2 * time.Second)
 	roll := RollDice()
 	fmt.Println(roll)
 
-	newPosX := posX - roll
-	newPosY := posY
+	newPathIndex := getNextPosition(player1Path, pathIndex, roll)
+	newPosX := player1Path[newPathIndex][0]
+	newPosY := player1Path[newPathIndex][1]
 
-	// Check for board boundaries
-	if newPosX < 0 || newPosX >= 11 || newPosY < 0 || newPosY >= 11 {
-		fmt.Println("Border reached")
-		DrawCurrentBoard(b)
-		return posX, posY
-	}
-
-	// Check if the new position is valid
-	if containsPosition(newPosX, newPosY) {
+	if isValidPosition(newPosX, newPosY, b) {
 		b[posX][posY] = "0"
 		b[newPosX][newPosY] = "1"
 		DrawCurrentBoard(b)
-		return newPosX, newPosY
+		return newPosX, newPosY, newPathIndex
 	}
 
 	fmt.Println("Invalid position")
 	b[posX][posY] = "1"
 	DrawCurrentBoard(b)
-	return posX, posY
+	return posX, posY, pathIndex
 }
 
-func P2Move(posX, posY int) (int, int) {
+func P2Move(posX, posY, pathIndex int) (int, int, int) {
 	fmt.Print("Rolling dice...\n")
 	time.Sleep(2 * time.Second)
 	roll := RollDice()
 	fmt.Println(roll)
 
-	newPosX := posX
-	newPosY := posY + roll
+	newPathIndex := getNextPosition(player2Path, pathIndex, roll)
+	newPosX := player2Path[newPathIndex][0]
+	newPosY := player2Path[newPathIndex][1]
 
-	if newPosX < 0 || newPosX >= 11 || newPosY < 0 || newPosY >= 11 {
-		fmt.Println("Border reached")
-		DrawCurrentBoard(b)
-		return posX, posY
-	}
-
-	if containsPosition(newPosX, newPosY) {
+	if isValidPosition(newPosX, newPosY, b) {
 		b[posX][posY] = "0"
 		b[newPosX][newPosY] = "1"
 		DrawCurrentBoard(b)
-		return newPosX, newPosY
+		return newPosX, newPosY, newPathIndex
 	}
 
 	fmt.Println("Invalid position")
 	b[posX][posY] = "1"
 	DrawCurrentBoard(b)
-	return posX, posY
+	return posX, posY, pathIndex
+}
+
+func getNextPosition(path [][]int, currentIndex int, roll int) int {
+
+	newPosition := currentIndex + roll
+	if newPosition >= len(path) {
+
+		newPosition = newPosition % len(path)
+
+	}
+
+	return newPosition
+
+}
+
+func isValidPosition(posX, posY int, b Board) bool {
+	if posX < 0 || posX >= len(b) || posY < 0 || posY >= len(b[0]) {
+		return false
+	}
+	cell := b[posX][posY]
+	return cell != "#" && cell != "h"
 }
 
 /*
-func calculateObstacle(posX, posY int, b Board) bool {
+	func getValidPositions(b Board) [][]int {
+		var validPositions [][]int
 
-	return b[posX][posY] == "#" || b[posX][posY] == "h"
-}
-*/
+		for i, row := range b {
+			for j, cell := range row {
 
-func getValidPositions(b Board) [][]int {
-	var validPositions [][]int
-
-	for i, row := range b {
-		for j, cell := range row {
-
-			if cell == "0" {
-				validPositions = append(validPositions, []int{i, j})
+				if cell == "0" {
+					validPositions = append(validPositions, []int{i, j})
+				}
 			}
 		}
+
+		return validPositions
 	}
 
-	return validPositions
-}
-
-func containsPosition(posX, posY int) bool {
-	for _, position := range validPositions {
-		if position[0] == posX && position[1] == posY {
-			return true
+	func containsPosition(posX, posY int) bool {
+		for _, position := range validPositions {
+			if position[0] == posX && position[1] == posY {
+				return true
+			}
 		}
+		return false
 	}
-	return false
-}
-
+*/
 func Game() {
 
 	var currentPlayer int
@@ -274,13 +302,13 @@ func Game() {
 						fmt.Scan(&choice)
 						if wantsToRoll(choice) {
 							b[10][4] = "0"
-							p1PosX, p1PosY = P1Move(p1PosX, p1PosY)
+							p1PosX, p1PosY, p1PathIndex = P1Move(p1PosX, p1PosY, p1PathIndex)
 							fmt.Println(p1PosX, p1PosY)
 
 						}
 					}
 				} else {
-					p1PosX, p1PosY = P1Move(p1PosX, p1PosY)
+					p1PosX, p1PosY, p1PathIndex = P1Move(p1PosX, p1PosY, p1PathIndex)
 					fmt.Println(p1PosX, p1PosY)
 				}
 				currentPlayer = 1
@@ -298,12 +326,12 @@ func Game() {
 						fmt.Scan(&choice)
 						if wantsToRoll(choice) {
 							b[4][0] = "0"
-							p2PosX, p2PosY = P2Move(p2PosX, p2PosY)
+							p2PosX, p2PosY, p2PathIndex = P2Move(p2PosX, p2PosY, p2PathIndex)
 							fmt.Println(p2PosX, p2PosY)
 						}
 					}
 				} else {
-					p2PosX, p2PosY = P2Move(p2PosX, p2PosY)
+					p2PosX, p2PosY, p2PathIndex = P2Move(p2PosX, p2PosY, p2PathIndex)
 					fmt.Println(p2PosX, p2PosY)
 				}
 				currentPlayer = 0
