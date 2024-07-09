@@ -8,6 +8,10 @@ import (
 	"github.com/fatih/color"
 )
 
+// player path positions = 39 (0-39)
+// laps needed for win = 4
+// first to get 4 laps wins
+
 type Board [11][11]string
 
 var p1out, p2out bool
@@ -17,6 +21,8 @@ var p1PosY = 4
 
 var p2PosX = 4
 var p2PosY = 0
+
+var p1TotalLaps, p2TotalLaps int
 
 var player1Path = [][]int{
 
@@ -45,12 +51,12 @@ var player2Path = [][]int{
 var p1PathIndex int
 var p2PathIndex int
 
-// initializing and returning board
+var red = color.New(color.FgRed).SprintFunc()
+var blue = color.New(color.FgBlue).SprintFunc()
+var yellow = color.New(color.FgYellow).SprintFunc()
+var black = color.New(color.FgBlack).SprintFunc()
+
 func GetBoard() Board {
-	red := color.New(color.FgRed).SprintFunc()
-	blue := color.New(color.FgBlue).SprintFunc()
-	yellow := color.New(color.FgYellow).SprintFunc()
-	black := color.New(color.FgBlack).SprintFunc()
 
 	board := Board{
 		{"", "", "#", "#", "0", "0", "0", "#", "#", "", ""},
@@ -148,8 +154,6 @@ func isOut(roll int) bool {
 // board that the players will use
 var b = GetBoard()
 
-// board for calculations
-
 func P1Out() bool {
 
 	fmt.Print("Rolling dice...\n")
@@ -165,7 +169,7 @@ func P1Out() bool {
 
 	// player managed to go to the starting point
 	p1out = true
-	b[10][4] = "1"
+	b[10][4] = yellow("1")
 	DrawCurrentBoard(b)
 
 	return true
@@ -185,69 +189,66 @@ func P2Out() bool {
 	}
 
 	p2out = true
-	b[4][0] = "1"
+	b[4][0] = red("1")
 	DrawCurrentBoard(b)
 
 	return true
 
 }
 
-func P1Move(posX, posY, pathIndex int) (int, int, int) {
+func P1Move(posX, posY, pathIndex int) (int, int, int, int) {
 	fmt.Print("Rolling dice...\n")
 	time.Sleep(2 * time.Second)
 	roll := RollDice()
 	fmt.Println(roll)
 
-	newPathIndex := getNextPosition(player1Path, pathIndex, roll)
+	newPathIndex, laps := getNextPosition(player1Path, pathIndex, roll)
 	newPosX := player1Path[newPathIndex][0]
 	newPosY := player1Path[newPathIndex][1]
 
 	if isValidPosition(newPosX, newPosY, b) {
 		b[posX][posY] = "0"
-		b[newPosX][newPosY] = "1"
+		b[newPosX][newPosY] = yellow("1")
 		DrawCurrentBoard(b)
-		return newPosX, newPosY, newPathIndex
+		return newPosX, newPosY, newPathIndex, laps
 	}
 
 	fmt.Println("Invalid position")
-	b[posX][posY] = "1"
+	b[posX][posY] = yellow("1")
 	DrawCurrentBoard(b)
-	return posX, posY, pathIndex
+	return posX, posY, pathIndex, 0
 }
 
-func P2Move(posX, posY, pathIndex int) (int, int, int) {
+func P2Move(posX, posY, pathIndex int) (int, int, int, int) {
 	fmt.Print("Rolling dice...\n")
 	time.Sleep(2 * time.Second)
 	roll := RollDice()
 	fmt.Println(roll)
 
-	newPathIndex := getNextPosition(player2Path, pathIndex, roll)
+	newPathIndex, laps := getNextPosition(player2Path, pathIndex, roll)
 	newPosX := player2Path[newPathIndex][0]
 	newPosY := player2Path[newPathIndex][1]
 
 	if isValidPosition(newPosX, newPosY, b) {
 		b[posX][posY] = "0"
-		b[newPosX][newPosY] = "1"
+		b[newPosX][newPosY] = red("1")
 		DrawCurrentBoard(b)
-		return newPosX, newPosY, newPathIndex
+		return newPosX, newPosY, newPathIndex, laps
 	}
 
 	fmt.Println("Invalid position")
-	b[posX][posY] = "1"
+	b[posX][posY] = yellow("1")
 	DrawCurrentBoard(b)
-	return posX, posY, pathIndex
+	return posX, posY, pathIndex, 0
 }
 
-func getNextPosition(path [][]int, currentIndex int, roll int) int {
+func getNextPosition(path [][]int, currentIndex int, roll int) (int, int) {
 
 	newPosition := currentIndex + roll
-	if newPosition >= len(path) {
+	laps := newPosition / len(path)
+	newPosition = newPosition % len(path)
 
-		newPosition = newPosition % len(path)
-
-	}
-
-	return newPosition
+	return newPosition, laps
 
 }
 
@@ -259,35 +260,76 @@ func isValidPosition(posX, posY int, b Board) bool {
 	return cell != "#" && cell != "h"
 }
 
-/*
-	func getValidPositions(b Board) [][]int {
-		var validPositions [][]int
+func lapAction(lap int, player string) {
 
-		for i, row := range b {
-			for j, cell := range row {
+	switch lap {
 
-				if cell == "0" {
-					validPositions = append(validPositions, []int{i, j})
-				}
-			}
+	case 1:
+
+		if player == "P1" {
+
+			b[9][5] = "1"
+
 		}
 
-		return validPositions
+		if player == "P2" {
+
+			b[5][1] = "1"
+
+		}
+
+	case 2:
+
+		if player == "P1" {
+
+			b[8][5] = "1"
+
+		}
+
+		if player == "P2" {
+
+			b[5][2] = "1"
+
+		}
+
+	case 3:
+
+		if player == "P1" {
+
+			b[7][5] = "1"
+
+		}
+
+		if player == "P2" {
+
+			b[5][3] = "1"
+
+		}
+
+	case 4:
+
+		if player == "P1" {
+
+			b[6][5] = "1"
+
+		}
+
+		if player == "P2" {
+
+			b[5][4] = "1"
+
+		}
+
 	}
 
-	func containsPosition(posX, posY int) bool {
-		for _, position := range validPositions {
-			if position[0] == posX && position[1] == posY {
-				return true
-			}
-		}
-		return false
-	}
-*/
+}
+
 func Game() {
 
+	// temp variables
 	var currentPlayer int
 	var choice int
+	var p1lap, p2lap int
 
 	DrawCurrentBoard(b)
 
@@ -302,13 +344,20 @@ func Game() {
 						fmt.Scan(&choice)
 						if wantsToRoll(choice) {
 							b[10][4] = "0"
-							p1PosX, p1PosY, p1PathIndex = P1Move(p1PosX, p1PosY, p1PathIndex)
+							p1PosX, p1PosY, p1PathIndex, p1lap = P1Move(p1PosX, p1PosY, p1PathIndex)
+							p1TotalLaps += p1lap
+							fmt.Println("lap: ", p1lap)
+							fmt.Println("total: ", p1TotalLaps)
 							fmt.Println(p1PosX, p1PosY)
 
 						}
 					}
 				} else {
-					p1PosX, p1PosY, p1PathIndex = P1Move(p1PosX, p1PosY, p1PathIndex)
+					p1PosX, p1PosY, p1PathIndex, p1lap = P1Move(p1PosX, p1PosY, p1PathIndex)
+					p1TotalLaps += p1lap
+					lapAction(p1TotalLaps, "P1")
+					fmt.Println("lap: ", p1lap)
+					fmt.Println("total: ", p1TotalLaps)
 					fmt.Println(p1PosX, p1PosY)
 				}
 				currentPlayer = 1
@@ -326,12 +375,20 @@ func Game() {
 						fmt.Scan(&choice)
 						if wantsToRoll(choice) {
 							b[4][0] = "0"
-							p2PosX, p2PosY, p2PathIndex = P2Move(p2PosX, p2PosY, p2PathIndex)
+
+							p2PosX, p2PosY, p2PathIndex, p2lap = P2Move(p2PosX, p2PosY, p2PathIndex)
+							p2TotalLaps += p2lap
+							fmt.Println("lap: ", p2lap)
+							fmt.Println("total: ", p2TotalLaps)
 							fmt.Println(p2PosX, p2PosY)
 						}
 					}
 				} else {
-					p2PosX, p2PosY, p2PathIndex = P2Move(p2PosX, p2PosY, p2PathIndex)
+					p2PosX, p2PosY, p2PathIndex, p2lap = P2Move(p2PosX, p2PosY, p2PathIndex)
+					p2TotalLaps += p2lap
+					lapAction(p2TotalLaps, "P2")
+					fmt.Println("lap: ", p2lap)
+					fmt.Println("total: ", p2TotalLaps)
 					fmt.Println(p2PosX, p2PosY)
 				}
 				currentPlayer = 0
