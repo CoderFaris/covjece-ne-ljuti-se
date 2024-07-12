@@ -269,9 +269,9 @@ func PlayerMove(player *Player, players []*Player, b *Board) (int, int, int) {
 		otherPlayer := findPlayer(piece, players)
 
 		if otherPlayer != nil {
-			// Resetting player who is eaten
+			// resetting player who is eaten
 			otherPlayer.PlayerOut = false
-			otherPlayer.PosX = otherPlayer.StartX // Corrected to use otherPlayer's start positions
+			otherPlayer.PosX = otherPlayer.StartX
 			otherPlayer.PosY = otherPlayer.StartY
 			otherPlayer.TotalLaps = 0
 			otherPlayer.Laps = 0

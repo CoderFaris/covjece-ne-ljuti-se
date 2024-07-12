@@ -8,7 +8,7 @@ import (
 )
 
 func TestEatPiece(t *testing.T) {
-	// Setup players
+
 	player1 := &game.Player{
 		PlayerOut: true,
 		PosX:      4,
@@ -31,7 +31,7 @@ func TestEatPiece(t *testing.T) {
 		PathIndex: 4,
 	}
 
-	players := []*game.Player{player1, player2} // Include all players
+	players := []*game.Player{player1, player2}
 
 	b := game.GetBoard()
 
@@ -48,7 +48,6 @@ func TestEatPiece(t *testing.T) {
 		fmt.Println()
 	}
 
-	// print player details
 	fmt.Printf("Player1 (%s) at (%d, %d)\n", player1.Color, player1.PosX, player1.PosY)
 	fmt.Printf("Player2 (%s) at (%d, %d)\n", player2.Color, player2.PosX, player2.PosY)
 
