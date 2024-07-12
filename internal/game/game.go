@@ -15,17 +15,17 @@ import (
 type Board [11][11]string
 
 type Player struct {
-	playerOut      bool
-	posX, posY     int
-	totalLaps      int
-	pathIndex      int
-	path           [][]int
-	startX, startY int
-	laps           int
-	color          string
+	PlayerOut      bool
+	PosX, PosY     int
+	TotalLaps      int
+	PathIndex      int
+	Path           [][]int
+	StartX, StartY int
+	Laps           int
+	Color          string
 }
 
-var player1Path = [][]int{
+var Player1Path = [][]int{
 
 	{10, 4}, {9, 4}, {8, 4}, {7, 4}, {6, 4},
 	{6, 3}, {6, 2}, {6, 1}, {6, 0}, {5, 0},
@@ -37,7 +37,7 @@ var player1Path = [][]int{
 	{8, 6}, {9, 6}, {10, 6}, {10, 5},
 }
 
-var player2Path = [][]int{
+var Player2Path = [][]int{
 
 	{4, 0}, {4, 1}, {4, 2}, {4, 3}, {4, 4},
 	{3, 4}, {2, 4}, {1, 4}, {0, 4}, {0, 5},
@@ -49,29 +49,75 @@ var player2Path = [][]int{
 	{6, 3}, {6, 2}, {6, 1}, {6, 0}, {5, 0}, {4, 0},
 }
 
-var red = color.New(color.FgRed).SprintFunc()
-var blue = color.New(color.FgBlue).SprintFunc()
-var yellow = color.New(color.FgYellow).SprintFunc()
-var black = color.New(color.FgBlack).SprintFunc()
+var Player3Path = [][]int{
+
+	{0, 6}, {1, 6}, {2, 6}, {3, 6}, {4, 6}, {4, 7},
+	{4, 8}, {4, 9}, {4, 10}, {5, 10}, {6, 10},
+	{6, 9}, {6, 8}, {6, 7}, {6, 6}, {7, 6},
+	{8, 6}, {9, 6}, {10, 6}, {10, 5},
+	{10, 4}, {9, 4}, {8, 4}, {7, 4}, {6, 4},
+	{6, 3}, {6, 2}, {6, 1}, {6, 0}, {5, 0}, {4, 0},
+	{4, 1}, {4, 2}, {4, 3}, {4, 4},
+	{3, 4}, {2, 4}, {1, 4}, {0, 4}, {0, 5},
+}
+
+var Player4Path = [][]int{
+
+	{6, 10}, {6, 9}, {6, 8}, {6, 7}, {6, 6}, {7, 6},
+	{8, 6}, {9, 6}, {10, 6}, {10, 5},
+	{10, 4}, {9, 4}, {8, 4}, {7, 4}, {6, 4},
+	{6, 3}, {6, 2}, {6, 1}, {6, 0}, {5, 0}, {4, 0},
+	{4, 1}, {4, 2}, {4, 3}, {4, 4},
+	{3, 4}, {2, 4}, {1, 4}, {0, 4}, {0, 5},
+	{0, 6}, {1, 6}, {2, 6}, {3, 6}, {4, 6}, {4, 7},
+	{4, 8}, {4, 9}, {4, 10}, {5, 10},
+}
+
+var Red = color.New(color.FgRed).SprintFunc()
+var Blue = color.New(color.FgBlue).SprintFunc()
+var Yellow = color.New(color.FgYellow).SprintFunc()
+var Black = color.New(color.FgBlack).SprintFunc()
 
 var player1 = Player{
-	posX:      10,
-	posY:      4,
-	path:      player1Path,
-	startX:    10,
-	startY:    4,
-	playerOut: false,
-	color:     yellow("1"),
+	PosX:      10,
+	PosY:      4,
+	Path:      Player1Path,
+	StartX:    10,
+	StartY:    4,
+	PlayerOut: false,
+	Color:     Yellow("1"),
 }
 
 var player2 = Player{
-	posX:      4,
-	posY:      0,
-	path:      player2Path,
-	startX:    4,
-	startY:    0,
-	playerOut: false,
-	color:     red("1"),
+	PosX:      4,
+	PosY:      0,
+	Path:      Player2Path,
+	StartX:    4,
+	StartY:    0,
+	PlayerOut: false,
+	Color:     Red("1"),
+}
+
+var player3 = Player{
+
+	PosX:      0,
+	PosY:      6,
+	Path:      Player3Path,
+	StartX:    0,
+	StartY:    6,
+	PlayerOut: false,
+	Color:     Blue("1"),
+}
+
+var player4 = Player{
+
+	PosX:      6,
+	PosY:      10,
+	Path:      Player4Path,
+	StartX:    6,
+	StartY:    10,
+	PlayerOut: false,
+	Color:     Black("1"),
 }
 
 func GetBoard() Board {
@@ -91,58 +137,58 @@ func GetBoard() Board {
 	}
 
 	// out positions
-	board[0][0] = red("0")
-	board[0][1] = red("0")
-	board[1][0] = red("0")
-	board[1][1] = red("0")
+	board[0][0] = Red("0")
+	board[0][1] = Red("0")
+	board[1][0] = Red("0")
+	board[1][1] = Red("0")
 
-	board[0][9] = blue("0")
-	board[0][10] = blue("0")
-	board[1][9] = blue("0")
-	board[1][10] = blue("0")
+	board[0][9] = Blue("0")
+	board[0][10] = Blue("0")
+	board[1][9] = Blue("0")
+	board[1][10] = Blue("0")
 
-	board[9][0] = yellow("0")
-	board[9][1] = yellow("0")
-	board[10][0] = yellow("0")
-	board[10][1] = yellow("0")
+	board[9][0] = Yellow("0")
+	board[9][1] = Yellow("0")
+	board[10][0] = Yellow("0")
+	board[10][1] = Yellow("0")
 
-	board[9][9] = black("0")
-	board[9][10] = black("0")
-	board[10][9] = black("0")
-	board[10][10] = black("0")
+	board[9][9] = Black("0")
+	board[9][10] = Black("0")
+	board[10][9] = Black("0")
+	board[10][10] = Black("0")
 
 	// home (ending) positions
-	board[1][5] = blue("h")
-	board[2][5] = blue("h")
-	board[3][5] = blue("h")
-	board[4][5] = blue("h")
+	board[1][5] = Blue("h")
+	board[2][5] = Blue("h")
+	board[3][5] = Blue("h")
+	board[4][5] = Blue("h")
 
-	board[6][5] = yellow("h")
-	board[7][5] = yellow("h")
-	board[8][5] = yellow("h")
-	board[9][5] = yellow("h")
+	board[6][5] = Yellow("h")
+	board[7][5] = Yellow("h")
+	board[8][5] = Yellow("h")
+	board[9][5] = Yellow("h")
 
-	board[5][1] = red("h")
-	board[5][2] = red("h")
-	board[5][3] = red("h")
-	board[5][4] = red("h")
+	board[5][1] = Red("h")
+	board[5][2] = Red("h")
+	board[5][3] = Red("h")
+	board[5][4] = Red("h")
 
-	board[5][6] = black("h")
-	board[5][7] = black("h")
-	board[5][8] = black("h")
-	board[5][9] = black("h")
+	board[5][6] = Black("h")
+	board[5][7] = Black("h")
+	board[5][8] = Black("h")
+	board[5][9] = Black("h")
 
 	// starting positions
-	board[10][4] = yellow("A")
-	board[4][0] = red("A")
-	board[0][6] = blue("A")
-	board[6][10] = black("A")
+	board[10][4] = Yellow("A")
+	board[4][0] = Red("A")
+	board[0][6] = Blue("A")
+	board[6][10] = Black("A")
 
 	return board
 }
 
 // current board state
-func DrawCurrentBoard(board Board) {
+func DrawCurrentBoard(board *Board) {
 	for _, row := range board {
 		for _, cell := range row {
 			fmt.Print(cell, " ")
@@ -171,7 +217,7 @@ func isOut(roll int) bool {
 
 func checkWin(totalLaps int, player string) (bool, string) {
 
-	if totalLaps == 4 && (player == "P1" || player == "P2") {
+	if totalLaps == 4 && (player == "P1" || player == "P2" || player == "P3" || player == "P4") {
 
 		return true, player
 
@@ -181,10 +227,7 @@ func checkWin(totalLaps int, player string) (bool, string) {
 
 }
 
-// board that the players will use
-var b = GetBoard()
-
-func playerOut(player *Player) bool {
+func PlayerOut(player *Player, b *Board) bool {
 
 	fmt.Print("Rolling dice...\n")
 	time.Sleep(2 * time.Second)
@@ -198,35 +241,59 @@ func playerOut(player *Player) bool {
 	}
 
 	// player managed to go to the starting point
-	player.playerOut = true
-	b[player.startX][player.startY] = player.color
+	player.PlayerOut = true
+	(*b)[player.StartX][player.StartY] = player.Color
 	DrawCurrentBoard(b)
 
 	return true
 
 }
 
-func playerMove(player *Player) (int, int, int) {
+func PlayerMove(player *Player, players []*Player, b *Board) (int, int, int) {
 	fmt.Print("Rolling dice...\n")
 	time.Sleep(2 * time.Second)
 	roll := RollDice()
 	fmt.Println(roll)
 
-	newIndex, laps := getNextPosition(player.path, player.pathIndex, roll)
-	newPosX := player.path[newIndex][0]
-	newPosY := player.path[newIndex][1]
+	newIndex, laps := getNextPosition(player.Path, player.PathIndex, roll)
+	newPosX := player.Path[newIndex][0]
+	newPosY := player.Path[newIndex][1]
+
+	fmt.Printf("Player %v moving from (%d, %d) to (%d, %d)\n", getPlayerName(player), player.PosX, player.PosY, newPosX, newPosY)
+	piece := b[newPosX][newPosY]
+	fmt.Printf("Piece is: %v\n", piece)
+
+	if EatPiece(newPosX, newPosY, b) {
+		piece := (*b)[newPosX][newPosY]
+		fmt.Printf("Detected piece at (%d, %d): %v\n", newPosX, newPosY, piece)
+		otherPlayer := findPlayer(piece, players)
+
+		if otherPlayer != nil {
+			// Resetting player who is eaten
+			otherPlayer.PlayerOut = false
+			otherPlayer.PosX = otherPlayer.StartX // Corrected to use otherPlayer's start positions
+			otherPlayer.PosY = otherPlayer.StartY
+			otherPlayer.TotalLaps = 0
+			otherPlayer.Laps = 0
+
+			fmt.Printf("%v's piece was eaten and sent back to the out section.\n", getPlayerName(otherPlayer))
+		} else {
+			fmt.Println("Error: Could not find the player associated with the piece.")
+		}
+	}
 
 	if isValidPosition(newPosX, newPosY, b) {
-		b[player.posX][player.posY] = "0"
-		b[newPosX][newPosY] = player.color
+		fmt.Println("entering isvalid")
+		(*b)[player.PosX][player.PosY] = "0"
+		(*b)[newPosX][newPosY] = player.Color
 		DrawCurrentBoard(b)
-		player.posX, player.posY, player.pathIndex = newPosX, newPosY, newIndex
+		player.PosX, player.PosY, player.PathIndex = newPosX, newPosY, newIndex
 		return newPosX, newPosY, laps
 	} else {
 		fmt.Println("Invalid position")
-		b[player.posX][player.posY] = player.color
+		(*b)[player.PosX][player.PosY] = player.Color
 		DrawCurrentBoard(b)
-		return player.posX, player.posY, 0
+		return player.PosX, player.PosY, 0
 	}
 }
 
@@ -240,7 +307,7 @@ func getNextPosition(path [][]int, currentIndex int, roll int) (int, int) {
 
 }
 
-func isValidPosition(posX, posY int, b Board) bool {
+func isValidPosition(posX, posY int, b *Board) bool {
 	if posX < 0 || posX >= len(b) || posY < 0 || posY >= len(b[0]) {
 		return false
 	}
@@ -248,7 +315,33 @@ func isValidPosition(posX, posY int, b Board) bool {
 	return cell != "#" && cell != "h"
 }
 
-func lapAction(lap int, player *Player) {
+func EatPiece(posX, posY int, b *Board) bool {
+
+	fmt.Printf("Checking piece at (%d, %d)\n", posX, posY)
+	if b[posX][posY] == Yellow("1") || b[posX][posY] == Red("1") || b[posX][posY] == Blue("1") || b[posX][posY] == Black("1") {
+
+		return true
+
+	}
+
+	return false
+
+}
+
+func findPlayer(piece any, players []*Player) *Player {
+	fmt.Println("Finding player for piece: ", piece)
+	for _, player := range players {
+		fmt.Printf("Checking player: %v with color: %v\n", getPlayerName(player), player.Color)
+		if player.Color == piece {
+			fmt.Printf("Found matching player: %v\n", getPlayerName(player))
+			return player
+		}
+	}
+	fmt.Println("No player found for piece: ", piece)
+	return nil
+}
+
+func lapAction(lap int, player *Player, b *Board) {
 
 	switch lap {
 
@@ -266,6 +359,18 @@ func lapAction(lap int, player *Player) {
 
 		}
 
+		if player == &player3 {
+
+			b[1][5] = "1"
+
+		}
+
+		if player == &player4 {
+
+			b[5][9] = "1"
+
+		}
+
 	case 2:
 
 		if player == &player1 {
@@ -277,6 +382,18 @@ func lapAction(lap int, player *Player) {
 		if player == &player2 {
 
 			b[5][2] = "1"
+
+		}
+
+		if player == &player3 {
+
+			b[2][5] = "1"
+
+		}
+
+		if player == &player4 {
+
+			b[5][8] = "1"
 
 		}
 
@@ -294,6 +411,18 @@ func lapAction(lap int, player *Player) {
 
 		}
 
+		if player == &player3 {
+
+			b[3][5] = "1"
+
+		}
+
+		if player == &player4 {
+
+			b[5][7] = "1"
+
+		}
+
 	case 4:
 
 		if player == &player1 {
@@ -305,6 +434,18 @@ func lapAction(lap int, player *Player) {
 		if player == &player2 {
 
 			b[5][4] = "1"
+
+		}
+
+		if player == &player3 {
+
+			b[4][5] = "1"
+
+		}
+
+		if player == &player4 {
+
+			b[5][6] = "1"
 
 		}
 
@@ -320,51 +461,81 @@ func getPlayerName(player *Player) string {
 
 	}
 
-	return "P2"
+	if player == &player2 {
+
+		return "P2"
+	}
+
+	if player == &player3 {
+
+		return "P3"
+	}
+
+	return "P4"
+
+}
+
+func resetTurn(turn int) int {
+
+	if turn > 3 {
+
+		turn = 0
+
+	}
+
+	return turn
 
 }
 
 func Game() {
-	var currentPlayer *Player = &player1
-	var otherPlayer *Player = &player2
+
+	var players = []*Player{&player1, &player2, &player3, &player4}
+	var turn int = 0
+
 	var choice int
 	var gameEnded = false
 	var winner string
 
-	DrawCurrentBoard(b)
+	b := GetBoard()
+
+	DrawCurrentBoard(&b)
 
 	for !gameEnded {
-		fmt.Printf("(%v) Roll dice? (1 for Yes, any key for No): ", getPlayerName(currentPlayer))
+		fmt.Printf("(%v) Roll dice? (1 for Yes, any key for No): ", getPlayerName(players[turn]))
 		fmt.Scan(&choice)
 		if wantsToRoll(choice) {
-			if !currentPlayer.playerOut {
-				if playerOut(currentPlayer) {
-					fmt.Printf("(%v) Roll again? (1 for Yes, any key for No): ", getPlayerName(currentPlayer))
+			if !players[turn].PlayerOut {
+				if PlayerOut(players[turn], &b) {
+					fmt.Printf("(%v) Roll again? (1 for Yes, any key for No): ", getPlayerName(players[turn]))
 					fmt.Scan(&choice)
 					if wantsToRoll(choice) {
-						b[currentPlayer.startX][currentPlayer.startY] = "0"
-						currentPlayer.posX, currentPlayer.posY, currentPlayer.laps = playerMove(currentPlayer)
-						currentPlayer.totalLaps += currentPlayer.laps
-						fmt.Println("lap: ", currentPlayer.laps)
-						fmt.Println("total: ", currentPlayer.totalLaps)
-						fmt.Println(currentPlayer.posX, currentPlayer.posY)
+						b[players[turn].StartX][players[turn].StartY] = "0"
+						players[turn].PosX, players[turn].PosY, players[turn].Laps = PlayerMove(players[turn], players, &b)
+						players[turn].TotalLaps += players[turn].Laps
+						fmt.Println("lap: ", players[turn].Laps)
+						fmt.Println("total: ", players[turn].TotalLaps)
+						fmt.Println(players[turn].PosX, players[turn].PosY)
 					}
 				}
 			} else {
-				currentPlayer.posX, currentPlayer.posY, currentPlayer.laps = playerMove(currentPlayer)
-				currentPlayer.totalLaps += currentPlayer.laps
-				lapAction(currentPlayer.totalLaps, currentPlayer)
-				gameEnded, winner = checkWin(currentPlayer.totalLaps, getPlayerName(currentPlayer))
-				fmt.Println("lap: ", currentPlayer.laps)
-				fmt.Println("total: ", currentPlayer.totalLaps)
-				fmt.Println(currentPlayer.posX, currentPlayer.posY)
+				players[turn].PosX, players[turn].PosY, players[turn].Laps = PlayerMove(players[turn], players, &b)
+				players[turn].TotalLaps += players[turn].Laps
+				lapAction(players[turn].TotalLaps, players[turn], &b)
+				gameEnded, winner = checkWin(players[turn].TotalLaps, getPlayerName(players[turn]))
+				fmt.Println("lap: ", players[turn].Laps)
+				fmt.Println("total: ", players[turn].TotalLaps)
+				fmt.Println(players[turn].PosX, players[turn].PosY)
 			}
-			currentPlayer, otherPlayer = otherPlayer, currentPlayer
+			turn += 1
+			turn = resetTurn(turn)
+
 		} else {
 			fmt.Println("Skipping turn.")
-			currentPlayer, otherPlayer = otherPlayer, currentPlayer
+			turn += 1
+			turn = resetTurn(turn)
 		}
 	}
 
 	fmt.Println("Winner is: ", winner)
+
 }
