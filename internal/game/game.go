@@ -282,6 +282,57 @@ func PlayerMove(player *Player, players []*Player, b *Board) (int, int, int) {
 		}
 	}
 
+	if isBooster(newPosX, newPosY, b) {
+		fmt.Println("Entering booster chain")
+		(*b)[player.PosX][player.PosY] = "0"
+
+		for isBooster(newPosX, newPosY, b) {
+			fmt.Printf("Booster activated at (%d, %d)\n", newPosX, newPosY)
+			(*b)[newPosX][newPosY] = "0" // Clear the booster tile
+
+			boostIndex, boostLaps := getNextPosition(player.Path, newIndex, roll)
+			laps += boostLaps
+			newIndex = boostIndex
+
+			// Handle wrap-around
+			if newIndex >= len(player.Path) {
+				newIndex = newIndex % len(player.Path)
+				laps++
+			}
+
+			newPosX = player.Path[newIndex][0]
+			newPosY = player.Path[newIndex][1]
+
+			fmt.Printf("Moved to (%d, %d)\n", newPosX, newPosY)
+
+			// Check for piece eating after each boost
+			if EatPiece(newPosX, newPosY, b) {
+				piece := (*b)[newPosX][newPosY]
+				fmt.Printf("Detected piece at (%d, %d): %v\n", newPosX, newPosY, piece)
+				otherPlayer := findPlayer(piece, players)
+
+				if otherPlayer != nil {
+					otherPlayer.PlayerOut = false
+					otherPlayer.PosX = otherPlayer.StartX
+					otherPlayer.PosY = otherPlayer.StartY
+					otherPlayer.TotalLaps = 0
+					otherPlayer.Laps = 0
+
+					fmt.Printf("%v's piece was eaten and sent back to the out section.\n", getPlayerName(otherPlayer))
+				} else {
+					fmt.Println("Error: Could not find the player associated with the piece.")
+				}
+			}
+		}
+
+		// Place the player on the final non-booster tile
+		(*b)[newPosX][newPosY] = player.Color
+		player.PosX, player.PosY, player.PathIndex = newPosX, newPosY, newIndex
+		fmt.Printf("Booster chain ended. Final position: (%d, %d)\n", newPosX, newPosY)
+		DrawCurrentBoard(b)
+		return newPosX, newPosY, laps
+	}
+
 	if isValidPosition(newPosX, newPosY, b) {
 		fmt.Println("entering isvalid")
 		(*b)[player.PosX][player.PosY] = "0"
@@ -295,6 +346,7 @@ func PlayerMove(player *Player, players []*Player, b *Board) (int, int, int) {
 		DrawCurrentBoard(b)
 		return player.PosX, player.PosY, 0
 	}
+
 }
 
 func getNextPosition(path [][]int, currentIndex int, roll int) (int, int) {
@@ -325,6 +377,38 @@ func EatPiece(posX, posY int, b *Board) bool {
 	}
 
 	return false
+
+}
+
+func isBooster(posX, posY int, b *Board) bool {
+
+	return b[posX][posY] == "B"
+
+}
+
+func generateBoosters(b *Board) {
+
+	// 4 boosters
+
+	positions := [][]int{{9, 4}, {8, 4}, {7, 4}, {6, 4},
+		{6, 3}, {6, 2}, {6, 1}, {6, 0}, {5, 0}, {4, 1}, {4, 2}, {4, 3}, {4, 4},
+		{3, 4}, {2, 4}, {1, 4}, {0, 4}, {0, 5}, {1, 6}, {2, 6}, {3, 6}, {4, 6}, {4, 7},
+		{4, 8}, {4, 9}, {4, 10}, {5, 10}, {6, 9}, {6, 8}, {6, 7}, {6, 6}, {7, 6},
+		{8, 6}, {9, 6}, {10, 6}, {10, 5}}
+
+	var randomPos [][]int
+	var i int
+
+	for i < 4 {
+
+		randomPos = append(randomPos, positions[rand.IntN(len(positions))])
+		i += 1
+	}
+
+	b[randomPos[0][0]][randomPos[0][1]] = "B"
+	b[randomPos[1][0]][randomPos[1][1]] = "B"
+	b[randomPos[2][0]][randomPos[2][1]] = "B"
+	b[randomPos[3][0]][randomPos[3][1]] = "B"
 
 }
 
@@ -498,6 +582,9 @@ func Game() {
 
 	b := GetBoard()
 
+	b[9][4] = "B"
+
+	generateBoosters(&b)
 	DrawCurrentBoard(&b)
 
 	for !gameEnded {
