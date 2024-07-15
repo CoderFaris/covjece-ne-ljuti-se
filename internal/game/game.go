@@ -286,15 +286,15 @@ func PlayerMove(player *Player, players []*Player, b *Board) (int, int, int) {
 		fmt.Println("Entering booster chain")
 		(*b)[player.PosX][player.PosY] = "0"
 
+		// check chaining boosters
 		for isBooster(newPosX, newPosY, b) {
 			fmt.Printf("Booster activated at (%d, %d)\n", newPosX, newPosY)
-			(*b)[newPosX][newPosY] = "0" // Clear the booster tile
+			(*b)[newPosX][newPosY] = "0"
 
 			boostIndex, boostLaps := getNextPosition(player.Path, newIndex, roll)
 			laps += boostLaps
 			newIndex = boostIndex
 
-			// Handle wrap-around
 			if newIndex >= len(player.Path) {
 				newIndex = newIndex % len(player.Path)
 				laps++
@@ -305,7 +305,6 @@ func PlayerMove(player *Player, players []*Player, b *Board) (int, int, int) {
 
 			fmt.Printf("Moved to (%d, %d)\n", newPosX, newPosY)
 
-			// Check for piece eating after each boost
 			if EatPiece(newPosX, newPosY, b) {
 				piece := (*b)[newPosX][newPosY]
 				fmt.Printf("Detected piece at (%d, %d): %v\n", newPosX, newPosY, piece)
@@ -325,7 +324,7 @@ func PlayerMove(player *Player, players []*Player, b *Board) (int, int, int) {
 			}
 		}
 
-		// Place the player on the final non-booster tile
+		// place the player on the final non-booster tile
 		(*b)[newPosX][newPosY] = player.Color
 		player.PosX, player.PosY, player.PathIndex = newPosX, newPosY, newIndex
 		fmt.Printf("Booster chain ended. Final position: (%d, %d)\n", newPosX, newPosY)
